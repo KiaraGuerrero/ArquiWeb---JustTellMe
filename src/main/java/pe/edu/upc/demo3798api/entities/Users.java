@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,11 +18,8 @@ public class Users implements Serializable {
     @Column(length = 30, unique = true)
     private String username;
     @Column(length = 200)
-
-    @JsonIgnore
     private String password;
     private Boolean enabled;
-    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private List<Role> roles;

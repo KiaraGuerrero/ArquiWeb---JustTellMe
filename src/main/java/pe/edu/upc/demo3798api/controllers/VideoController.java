@@ -3,6 +3,7 @@ package pe.edu.upc.demo3798api.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.demo3798api.dtos.VideoDTO;
 import pe.edu.upc.demo3798api.entities.Video;
@@ -16,9 +17,11 @@ import java.util.List;
 public class VideoController {
     @Autowired private IVideoService videoService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public List<Video> all() { return videoService.list(); }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<Video> one(@PathVariable int id) {
         Video v = videoService.listId(id);
@@ -26,6 +29,7 @@ public class VideoController {
         return ResponseEntity.ok(v);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Video> create(@RequestBody VideoDTO dto) {
         Video v = new Video();
@@ -37,6 +41,7 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Video> update(@PathVariable int id, @RequestBody VideoDTO dto) {
         Video v = videoService.listId(id);
@@ -48,6 +53,7 @@ public class VideoController {
         return ResponseEntity.ok(videoService.update(v));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         videoService.delete(id);

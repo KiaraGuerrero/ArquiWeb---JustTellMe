@@ -11,6 +11,11 @@ public interface IEvolucionEmocionalService {
     EvolucionEmocional listId(Integer id);
     EvolucionEmocional update(EvolucionEmocional evolucion);
     void delete(Integer id);
+
+    List<EvolucionEmocional> listarPorPaciente(Integer idUsuario);
+    List<EvolucionEmocional> listarDesdeFecha(LocalDateTime fecha);
+    int contarPorPaciente(Long idPaciente);
+    EvolucionEmocional obtenerUltimaEvolucion(Long idPaciente);
     EvolucionEmocional crearEvolucion(Long idPaciente, String estadoEmocional, String observaciones, LocalDateTime fechaRegistro);
 
 }

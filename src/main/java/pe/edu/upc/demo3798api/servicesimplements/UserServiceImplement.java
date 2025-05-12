@@ -39,6 +39,9 @@ public class UserServiceImplement implements IUserService {
         userRepo.deleteById(id);
     }
 
-
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepo.buscarUsername(username) > 0;
+    }
 }
 

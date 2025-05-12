@@ -68,4 +68,25 @@ public class MensajesChatServiceImplement implements IMensajesChatService {
 
         return mensajesChatRepository.save(mensaje);
     }
+    @Override
+    public List<MensajesChat> listarPorUsuario(Integer idUsuario) {
+        return mensajesChatRepository.findByUsuario_Id(idUsuario.longValue());
+
+    }
+
+    @Override
+    public List<MensajesChat> listarPorReunion(Integer idReunion) {
+        return mensajesChatRepository.findByReunion_IdReunion(idReunion);
+    }
+
+    @Override
+    public List<MensajesChat> buscarPorRangoFechas(LocalDateTime desde, LocalDateTime hasta) {
+        return mensajesChatRepository.buscarPorRangoFechas(desde, hasta);
+    }
+
+    @Override
+    public List<MensajesChat> buscarPorTexto(String texto) {
+        return mensajesChatRepository.buscarPorTexto(texto);
+    }
+
 }

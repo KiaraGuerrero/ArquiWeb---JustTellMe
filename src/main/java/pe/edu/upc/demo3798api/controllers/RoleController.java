@@ -3,6 +3,7 @@ package pe.edu.upc.demo3798api.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.demo3798api.dtos.RoleDTO;
 import pe.edu.upc.demo3798api.entities.Role;
@@ -19,9 +20,11 @@ public class RoleController {
     private IRoleService roleService;
     @Autowired private IUserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<Role> all() { return roleService.list(); }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Role> one(@PathVariable Long id) {
         Role r = roleService.listId(id);
@@ -29,6 +32,7 @@ public class RoleController {
         return ResponseEntity.ok(r);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Role> create(@RequestBody RoleDTO dto) {
         Users u = userService.listId(dto.userId);
@@ -40,6 +44,7 @@ public class RoleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Role> update(@PathVariable Long id, @RequestBody RoleDTO dto) {
         Role r = roleService.listId(id);
@@ -54,6 +59,7 @@ public class RoleController {
         return ResponseEntity.ok(saved);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         roleService.delete(id);

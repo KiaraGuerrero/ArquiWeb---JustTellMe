@@ -1,7 +1,6 @@
 package pe.edu.upc.demo3798api.entities;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity

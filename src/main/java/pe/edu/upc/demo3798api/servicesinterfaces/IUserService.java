@@ -10,5 +10,5 @@ public interface IUserService {
     Users listId(Long id);
     Users update(Users u);
     void delete(Long id);
-
+    boolean existsByUsername(String username);
 }

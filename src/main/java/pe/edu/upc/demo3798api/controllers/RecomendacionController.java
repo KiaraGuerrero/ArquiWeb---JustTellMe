@@ -2,6 +2,7 @@ package pe.edu.upc.demo3798api.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.demo3798api.dtos.RecomendacionDTO;
 import pe.edu.upc.demo3798api.entities.Recomendacion;
@@ -29,11 +30,17 @@ public class RecomendacionController {
         this.videoService = videoService;
     }
 
+    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO')")
     @GetMapping
     public List<Recomendacion> all() {
         return recService.list();
     }
 
+
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','PSICOLOGO') or " +
+                    "(hasRole('PACIENTE') and @recomendacionAuth.isOwner(principal.username,#id))"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<Recomendacion> one(@PathVariable Integer id) {
         Recomendacion r = recService.listId(id);
@@ -41,6 +48,7 @@ public class RecomendacionController {
         return ResponseEntity.ok(r);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','PSICOLOGO')")
     @PostMapping
     public ResponseEntity<Recomendacion> create(@RequestBody RecomendacionDTO dto) {
         // validar usuario
@@ -63,6 +71,9 @@ public class RecomendacionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    @PreAuthorize(
+            "hasRole('PACIENTE') and @recomendacionAuth.isOwner(principal.username, #id)"
+    )
     @PutMapping("/{id}")
     public ResponseEntity<Recomendacion> update(@PathVariable Integer id,
                                                 @RequestBody RecomendacionDTO dto) {
@@ -89,6 +100,9 @@ public class RecomendacionController {
         return ResponseEntity.ok(saved);
     }
 
+    @PreAuthorize(
+            "hasRole('ADMIN') or @recomendacionAuth.isOwner(principal.username, #id)"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         recService.delete(id);

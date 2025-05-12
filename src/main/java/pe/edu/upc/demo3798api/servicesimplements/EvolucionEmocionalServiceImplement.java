@@ -2,14 +2,13 @@ package pe.edu.upc.demo3798api.servicesimplements;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 import pe.edu.upc.demo3798api.entities.EvolucionEmocional;
 import pe.edu.upc.demo3798api.entities.Users;
 import pe.edu.upc.demo3798api.repositories.IEvolucionEmocionalRepository;
 import pe.edu.upc.demo3798api.repositories.IUserRepository;
 import pe.edu.upc.demo3798api.servicesinterfaces.IEvolucionEmocionalService;
-
+import org.springframework.data.domain.PageRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,6 +60,28 @@ public class EvolucionEmocionalServiceImplement implements IEvolucionEmocionalSe
         evolucion.setFechaRegistro(fechaRegistro);
 
         return evolucionRepo.save(evolucion);
+    }
+
+    @Override
+    public List<EvolucionEmocional> listarPorPaciente(Integer idUsuario) {
+        return evolucionRepo.findByPaciente_Id(idUsuario.longValue());
+    }
+
+
+    @Override
+    public List<EvolucionEmocional> listarDesdeFecha(LocalDateTime fecha) {
+        return evolucionRepo.buscarDesdeFecha(fecha);
+    }
+
+    @Override
+    public int contarPorPaciente(Long idPaciente) {
+        return evolucionRepo.contarPorPaciente(idPaciente);
+    }
+
+    @Override
+    public EvolucionEmocional obtenerUltimaEvolucion(Long idPaciente) {
+        List<EvolucionEmocional> lista = evolucionRepo.ultimaEvolucion(idPaciente, PageRequest.of(0, 1));
+        return lista.isEmpty() ? null : lista.get(0);
     }
 
 }

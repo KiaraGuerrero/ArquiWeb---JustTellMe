@@ -6,5 +6,6 @@ import pe.edu.upc.demo3798api.entities.Recomendacion;
 
 @Repository
 public interface IRecomendacionRepository extends JpaRepository<Recomendacion, Integer> {
-
+    // Ejemplo: List<Recomendacion> findByUsuario_Id(Long idUsuario);
+    // Ejemplo: List<Recomendacion> findByEstado(String estado);
 }

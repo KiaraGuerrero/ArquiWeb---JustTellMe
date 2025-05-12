@@ -7,7 +7,9 @@ import pe.edu.upc.demo3798api.entities.DatosWearable;
 import pe.edu.upc.demo3798api.repositories.IDatosWearableRepository;
 import pe.edu.upc.demo3798api.servicesinterfaces.IDatosWearableService;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DatosWearableServiceImplement implements IDatosWearableService {
@@ -39,5 +41,13 @@ public class DatosWearableServiceImplement implements IDatosWearableService {
         datosRepo.deleteById(id);
     }
 
+    @Override
+    public List<Map<LocalDate, Double>> promedioFrecuenciaPorDia(Long userId) {
+        return datosRepo.promedioFrecuenciaPorDia(userId);
+    }
 
+    @Override
+    public Integer maxFrecuenciaCardiaca(Long userId) {
+        return datosRepo.maxFrecuenciaCardiaca(userId);
+    }
 }

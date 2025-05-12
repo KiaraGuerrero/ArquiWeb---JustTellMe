@@ -6,4 +6,5 @@ import pe.edu.upc.demo3798api.entities.Video;
 
 @Repository
 public interface IVideoRepository extends JpaRepository<Video, Integer> {
+    // Ejemplo: List<Video> findByCategoria(String categoria);
 }

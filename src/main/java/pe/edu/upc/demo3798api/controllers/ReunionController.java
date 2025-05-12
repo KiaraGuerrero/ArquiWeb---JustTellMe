@@ -3,6 +3,7 @@ package pe.edu.upc.demo3798api.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.upc.demo3798api.dtos.ReunionDTO;
 import pe.edu.upc.demo3798api.entities.MensajesChat;
@@ -27,11 +28,16 @@ public class ReunionController {
     @Autowired
     private IUserService userService;
 
+    @PreAuthorize("hasAnyAuthority('ADMIN','PACIENTE','PSICOLOGO')")
     @GetMapping
     public List<Reunion> all() {
         return reunionService.list();
     }
 
+    /** ADMIN, PACIENTE y PSICOLOGO pueden ver detalle de una reunión si participan */
+    @PreAuthorize("hasRole('ADMIN') or " +
+            "(hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)) or " +
+            "(hasRole('PSICOLOGO') and @reunionAuth.isPsicologo(principal.username,#id))")
     @GetMapping("/{id}")
     public ResponseEntity<Reunion> one(@PathVariable int id) {
         Reunion r = reunionService.listId(id);
@@ -39,6 +45,8 @@ public class ReunionController {
         return ResponseEntity.ok(r);
     }
 
+
+    @PreAuthorize("hasRole('PACIENTE')")
     @PostMapping
     public ResponseEntity<Reunion> create(@RequestBody ReunionDTO dto) {
         Users paciente = userService.listId(dto.idPaciente);
@@ -57,6 +65,8 @@ public class ReunionController {
         return ResponseEntity.status(201).body(saved);
     }
 
+    /** Solo el PACIENTE dueño puede modificar su reunión */
+    @PreAuthorize("hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)")
     @PutMapping("/{id}")
     public ResponseEntity<Reunion> update(
             @PathVariable int id,
@@ -93,12 +103,20 @@ public class ReunionController {
         Reunion saved = reunionService.update(existing);
         return ResponseEntity.ok(saved);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id))")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         reunionService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE','PSICOLOGO') and " +
+            "(hasRole('ADMIN') or " +
+            "(hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)) or " +
+            "(hasRole('PSICOLOGO') and @reunionAuth.isPsicologo(principal.username,#id)))")
+    @GetMapping("/{id}/mensajes")
+    public ResponseEntity<List<MensajesChat>> mensajesPorReunion(@PathVariable Integer id) {
+        List<MensajesChat> msgs = mensajeService.listarPorReunion(id);
+        return ResponseEntity.ok(msgs);
+    }
 }
