@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -62,16 +63,31 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)       // API stateless :contentReference[oaicite:3]{index=3}
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // 1) endpoints públicos de login/registro
+                        .requestMatchers("/api/usuarios/register", "/api/usuarios/login").permitAll()
 
-                .authorizeHttpRequests(authz -> authz
-                        .anyRequest().authenticated()            // todo lo no ignorado requiere auth
+                        // 2) endpoints de Swagger (JSON + UI)
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**"
+                        ).permitAll()
+
+                        // 3) el resto requiere JWT válido
+                        .anyRequest().authenticated()
                 )
 
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                // inyectar el filtro JWT antes de UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // manejo de errores de autenticación
+                .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint))
+
+                // no creamos sesión
+                .sessionManagement(Customizer.withDefaults())
+        ;
 
         return http.build();
     }
