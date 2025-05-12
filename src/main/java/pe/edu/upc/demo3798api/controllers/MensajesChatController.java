@@ -28,7 +28,7 @@ public class MensajesChatController {
     }
 
     /** ADMIN, autor o participantes pueden ver un mensaje */
-    @PreAuthorize("hasRole('ADMIN') or @mensajeAuth.isAuthor(principal.username,#id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<MensajesChat> one(@PathVariable int id) {
         MensajesChat m = mensajesChatService.listId(id);
@@ -37,15 +37,14 @@ public class MensajesChatController {
     }
 
     /** PACIENTE y PSICOLOGO pueden enviar mensajes en sus reuniones */
-    @PreAuthorize("(hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#dto.idReunion)) or " +
-            "(hasRole('PSICOLOGO') and @reunionAuth.isPsicologo(principal.username,#dto.idReunion))")
+    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO')")
     @PostMapping
     public ResponseEntity<MensajesChat> create(@RequestBody MensajesChatDTO dto) {
         MensajesChat m = mensajesChatService.crearMensaje(dto.idUsuario, dto.idReunion, dto.mensaje, dto.fechaEnvio);
         return ResponseEntity.status(HttpStatus.CREATED).body(m);
     }
 
-    @PreAuthorize("@mensajeAuth.isAuthor(principal.username, #id)")
+
     @PutMapping("/{id}")
     public ResponseEntity<MensajesChat> update(@PathVariable int id, @RequestBody MensajesChatDTO dto) {
         MensajesChat existente = mensajesChatService.listId(id);
@@ -55,7 +54,7 @@ public class MensajesChatController {
         return ResponseEntity.ok(mensajesChatService.update(actualizado));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @mensajeAuth.isAuthor(principal.username, #id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         mensajesChatService.delete(id);
@@ -63,16 +62,14 @@ public class MensajesChatController {
     }
 
     /** Listar por usuario (solo ADMIN o el propio usuario) */
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('PACIENTE') and principal.username == @mensajeAuth.usernameById(#id))")
+    @PreAuthorize("hasAnyRole('ADMIN','PSICOLOGO')")
     @GetMapping("/usuario/{id}")
     public List<MensajesChat> porUsuario(@PathVariable Integer id) {
         return mensajesChatService.listarPorUsuario(id);
     }
 
     /** ADMIN, PACIENTE o PSICOLOGO pueden ver mensajes de una reunión si participan */
-    @PreAuthorize("hasRole('ADMIN') or " +
-            "(hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)) or " +
-            "(hasRole('PSICOLOGO') and @reunionAuth.isPsicologo(principal.username,#id))")
+    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO','ADMIN')")
     @GetMapping("/reunion/{id}")
     public List<MensajesChat> porReunion(@PathVariable Integer id) {
         return mensajesChatService.listarPorReunion(id);

@@ -68,7 +68,7 @@ public class DatosWearableController {
                 .body(saved);
     }
 
-    @PreAuthorize("hasAnyRole('PACIENTE') and @datosAuth.isOwner(principal.username, #id)")
+    @PreAuthorize("hasAnyRole('PACIENTE')")
     @PutMapping("/{id}")
     public ResponseEntity<DatosWearable> update(
             @PathVariable int id,
@@ -100,7 +100,7 @@ public class DatosWearableController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN') or @datosAuth.isOwner(principal.username, #id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<DatosWearable> one(@PathVariable int id) {
         DatosWearable d = datosService.listId(id);
@@ -109,14 +109,14 @@ public class DatosWearableController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') or @datosAuth.isOwner(principal.username, #id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         datosService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @datosAuth.isUser(principal.username, #userId)")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/report/promedio-fc/{id}")
     public ResponseEntity<List<Map<LocalDate,Double>>> promFcDia(
             @PathVariable("id") Long userId) {
@@ -124,7 +124,7 @@ public class DatosWearableController {
         return ResponseEntity.ok(lista);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @datosAuth.isUser(principal.username, #id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/report/max-fc/{id}")
     public Integer maxFc(@PathVariable Long id) {
         return datosService.maxFrecuenciaCardiaca(id);

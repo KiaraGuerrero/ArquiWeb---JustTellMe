@@ -1,6 +1,7 @@
 package pe.edu.upc.demo3798api.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -18,10 +19,12 @@ public class Users implements Serializable {
     @Column(length = 30, unique = true)
     private String username;
     @Column(length = 200)
+    @JsonIgnore
     private String password;
     private Boolean enabled;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
+    @JsonManagedReference
     private List<Role> roles;
 
 

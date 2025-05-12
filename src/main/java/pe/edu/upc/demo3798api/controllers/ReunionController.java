@@ -28,16 +28,14 @@ public class ReunionController {
     @Autowired
     private IUserService userService;
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','PACIENTE','PSICOLOGO')")
+    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE','PSICOLOGO')")
     @GetMapping
     public List<Reunion> all() {
         return reunionService.list();
     }
 
     /** ADMIN, PACIENTE y PSICOLOGO pueden ver detalle de una reunión si participan */
-    @PreAuthorize("hasRole('ADMIN') or " +
-            "(hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)) or " +
-            "(hasRole('PSICOLOGO') and @reunionAuth.isPsicologo(principal.username,#id))")
+    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE','PSICOLOGO')")
     @GetMapping("/{id}")
     public ResponseEntity<Reunion> one(@PathVariable int id) {
         Reunion r = reunionService.listId(id);
@@ -66,7 +64,7 @@ public class ReunionController {
     }
 
     /** Solo el PACIENTE dueño puede modificar su reunión */
-    @PreAuthorize("hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)")
+    @PreAuthorize("hasRole('PACIENTE')")
     @PutMapping("/{id}")
     public ResponseEntity<Reunion> update(
             @PathVariable int id,
@@ -103,17 +101,14 @@ public class ReunionController {
         Reunion saved = reunionService.update(existing);
         return ResponseEntity.ok(saved);
     }
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id))")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         reunionService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE','PSICOLOGO') and " +
-            "(hasRole('ADMIN') or " +
-            "(hasRole('PACIENTE') and @reunionAuth.isPaciente(principal.username,#id)) or " +
-            "(hasRole('PSICOLOGO') and @reunionAuth.isPsicologo(principal.username,#id)))")
+    @PreAuthorize("hasAnyRole('ADMIN','PACIENTE','PSICOLOGO')")
     @GetMapping("/{id}/mensajes")
     public ResponseEntity<List<MensajesChat>> mensajesPorReunion(@PathVariable Integer id) {
         List<MensajesChat> msgs = mensajeService.listarPorReunion(id);

@@ -38,8 +38,7 @@ public class RecomendacionController {
 
 
     @PreAuthorize(
-            "hasAnyRole('ADMIN','PSICOLOGO') or " +
-                    "(hasRole('PACIENTE') and @recomendacionAuth.isOwner(principal.username,#id))"
+            "hasAnyRole('ADMIN','PSICOLOGO')"
     )
     @GetMapping("/{id}")
     public ResponseEntity<Recomendacion> one(@PathVariable Integer id) {
@@ -72,7 +71,7 @@ public class RecomendacionController {
     }
 
     @PreAuthorize(
-            "hasRole('PACIENTE') and @recomendacionAuth.isOwner(principal.username, #id)"
+            "hasRole('PACIENTE')"
     )
     @PutMapping("/{id}")
     public ResponseEntity<Recomendacion> update(@PathVariable Integer id,
@@ -100,9 +99,7 @@ public class RecomendacionController {
         return ResponseEntity.ok(saved);
     }
 
-    @PreAuthorize(
-            "hasRole('ADMIN') or @recomendacionAuth.isOwner(principal.username, #id)"
-    )
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         recService.delete(id);
